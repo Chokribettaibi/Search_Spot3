@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    background: #020617;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply border border-white/10 bg-white/10 shadow-2xl backdrop-blur-2xl;
+  }
+
+  .scan-grid {
+    height: 60vh;
+    background-image:
+      linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+    background-size: 36px 36px;
+    mask-image: radial-gradient(circle at center, black 40%, transparent 78%);
+  }
+
+  .scan-line {
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(103, 232, 249, 0.7) 20%,
+      rgba(103, 232, 249, 1) 50%,
+      rgba(103, 232, 249, 0.7) 80%,
+      transparent 100%
+    );
+    box-shadow: 0 0 25px rgba(34, 211, 238, 0.8);
+    animation: scan 2.4s linear infinite;
+  }
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(0);
+    opacity: 0.3;
+  }
+
+  15%,
+  85% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(calc(58vh - 2px));
+    opacity: 0.3;
+  }
+}
