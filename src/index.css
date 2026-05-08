@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: dark;
+  }
+
   html,
   body,
   #root {
@@ -11,47 +15,147 @@
 
   body {
     margin: 0;
+    overflow-x: hidden;
     font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
     background: #020617;
+    color: #e2e8f0;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
   }
 }
 
 @layer components {
-  .glass-card {
-    @apply border border-white/10 bg-white/10 shadow-2xl backdrop-blur-2xl;
+  .app-shell {
+    @apply relative min-h-screen overflow-hidden bg-slate-950 text-white;
+  }
+
+  .ambient-backdrop {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at top, rgba(34, 211, 238, 0.16), transparent 26%),
+      radial-gradient(circle at bottom, rgba(59, 130, 246, 0.14), transparent 28%),
+      linear-gradient(180deg, rgba(15, 23, 42, 0.16), rgba(2, 6, 23, 0.94));
+  }
+
+  .scanner-frame {
+    @apply relative min-h-screen w-full overflow-hidden bg-black sm:min-h-[calc(100vh-2rem)] sm:rounded-[32px] sm:border sm:border-white/10;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+  }
+
+  .panel {
+    @apply rounded-[28px] border border-white/10 bg-slate-900/38 backdrop-blur-xl;
+    box-shadow: 0 12px 40px rgba(2, 6, 23, 0.28);
+  }
+
+  .dashboard-grid {
+    @apply grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)];
+  }
+
+  .stats-grid {
+    @apply grid grid-cols-2 gap-3 lg:grid-cols-4;
+  }
+
+  .stat-card {
+    @apply rounded-2xl border border-white/10 bg-white/[0.045] p-3 sm:p-4;
+  }
+
+  .stat-label {
+    @apply text-xs uppercase tracking-[0.2em] text-slate-400;
+  }
+
+  .stat-value {
+    @apply mt-2 text-lg font-semibold leading-tight text-white sm:text-xl;
+  }
+
+  .eyebrow {
+    @apply text-xs uppercase tracking-[0.28em] text-slate-400;
+  }
+
+  .ui-chip {
+    @apply inline-flex items-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-cyan-100;
+  }
+
+  .primary-btn,
+  .secondary-btn,
+  .accent-btn,
+  .warning-btn {
+    @apply inline-flex min-h-11 items-center justify-center rounded-full px-4 py-2 text-sm font-medium transition duration-200 ease-out;
+  }
+
+  .primary-btn {
+    @apply border border-cyan-300/30 bg-cyan-300/18 text-cyan-50 hover:bg-cyan-300/24;
+  }
+
+  .secondary-btn {
+    @apply border border-white/15 bg-white/10 text-white hover:bg-white/14;
+  }
+
+  .accent-btn {
+    @apply border border-cyan-400/30 bg-cyan-400/16 text-cyan-100 hover:bg-cyan-400/22;
+  }
+
+  .warning-btn {
+    @apply border border-amber-400/30 bg-amber-400/16 text-amber-100 hover:bg-amber-400/22;
+  }
+
+  .status-pill {
+    @apply rounded-full px-3 py-1 text-xs font-medium;
+  }
+
+  .capture-btn {
+    @apply inline-flex h-16 w-16 items-center justify-center rounded-full border border-cyan-300/35 bg-cyan-300/16 transition duration-200 ease-out hover:scale-[1.03] hover:bg-cyan-300/24;
+    box-shadow: 0 0 32px rgba(34, 211, 238, 0.18);
+  }
+
+  .history-drawer {
+    @apply absolute right-0 top-0 z-30 h-full w-full max-w-[min(88vw,24rem)] border-l border-white/10 bg-slate-950/72 backdrop-blur-xl transition-transform duration-300 ease-out;
+    will-change: transform;
+  }
+
+  .history-card {
+    @apply block w-full rounded-[24px] border border-white/10 bg-white/[0.06] p-4 text-left transition duration-200 ease-out hover:bg-white/[0.1];
   }
 
   .scan-grid {
-    height: 60vh;
     background-image:
-      linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
-    background-size: 36px 36px;
-    mask-image: radial-gradient(circle at center, black 40%, transparent 78%);
+      linear-gradient(rgba(148, 163, 184, 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.07) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(circle at center, black 42%, transparent 82%);
   }
 
   .scan-line {
     position: absolute;
-    inset-inline: 0;
-    top: 0;
+    inset-inline: 12%;
+    top: 12%;
     height: 2px;
     background: linear-gradient(
       90deg,
-      transparent 0%,
-      rgba(103, 232, 249, 0.7) 20%,
+      transparent,
+      rgba(103, 232, 249, 0.7) 24%,
       rgba(103, 232, 249, 1) 50%,
-      rgba(103, 232, 249, 0.7) 80%,
-      transparent 100%
+      rgba(103, 232, 249, 0.7) 76%,
+      transparent
     );
-    box-shadow: 0 0 25px rgba(34, 211, 238, 0.8);
-    animation: scan 2.4s linear infinite;
+    box-shadow: 0 0 18px rgba(34, 211, 238, 0.58);
+    animation: scan 2.8s linear infinite;
+    will-change: transform, opacity;
   }
 }
 
 @keyframes scan {
   0% {
     transform: translateY(0);
-    opacity: 0.3;
+    opacity: 0.32;
   }
 
   15%,
@@ -60,7 +164,27 @@
   }
 
   100% {
-    transform: translateY(calc(58vh - 2px));
-    opacity: 0.3;
+    transform: translateY(calc(100% + 18rem));
+    opacity: 0.32;
+  }
+}
+
+@media (max-width: 639px) {
+  .history-drawer {
+    max-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan-line,
+  .capture-btn,
+  .primary-btn,
+  .secondary-btn,
+  .accent-btn,
+  .warning-btn,
+  .history-card,
+  .history-drawer {
+    animation: none;
+    transition: none;
   }
 }

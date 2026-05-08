@@ -56,7 +56,7 @@ function GoogleLensScanner() {
       <div className="absolute inset-0 bg-[linear-gradient(to_bottom,_rgba(15,23,42,0.18),_rgba(2,6,23,0.94))]" />
 
       <div className="relative mx-auto flex min-h-screen max-w-7xl items-center justify-center p-0 md:p-6">
-        <div className="relative h-screen w-full overflow-hidden border-white/10 bg-black shadow-[0_30px_100px_rgba(0,0,0,0.55)] md:h-[92vh] md:rounded-[2rem] md:border">
+        <div className="relative h-screen w-full overflow-hidden bordstatuser-white/10 bg-black shadow-[0_30px_100px_rgba(0,0,0,0.55)] md:h-[92vh] md:rounded-[2rem] md:border">
           <video
             ref={videoRef}
             autoPlay
@@ -86,10 +86,10 @@ function GoogleLensScanner() {
               <div className="glass-card w-[min(92vw,26rem)] rounded-[2rem] p-8 text-center">
                 <div className="mx-auto h-16 w-16 animate-spin rounded-full border-4 border-white/10 border-t-cyan-300" />
                 <h1 className="mt-6 text-2xl font-semibold tracking-tight text-white">
-                  Loading vision model
+                  Loading model...
                 </h1>
                 <p className="mt-2 text-sm text-slate-300">
-                  Optimizing TensorFlow.js for realtime object detection.
+                  Wassa3 Balik m3ana la7tha bark 
                 </p>
               </div>
             </div>
@@ -98,21 +98,20 @@ function GoogleLensScanner() {
           <div className="absolute inset-x-0 top-0 z-20 p-4 md:p-6">
             <div className="glass-card flex flex-col gap-4 rounded-[1.75rem] p-4 md:flex-row md:items-center md:justify-between md:p-5">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.35em] text-cyan-200/80">
-                  Foussana 1418 <span className="text-rose-400">|</span> <span className="text-amber-400 lowercase"><span className="text-cyan-200 uppercase" >RM</span>: Malek <span className="text-cyan-200 uppercase" >ARM</span> Dalel</span>
+                <p className="text-[11px] uppercase tracking-[0.35em] text-cyan-200/80 px-4 py-1 rounded-full bg-cyan-400/10 inline-block zindex-10">
+                  Foussana 1418 <span className="text-rose-400">|<br></br></span> <span className="text-amber-400 lowercase"><span className="text-cyan-200 uppercase" >RM</span>: Malek <span className="text-cyan-200 uppercase" >ARM</span> Dalel</span>
                 </p>
                 <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white md:text-3xl">
                   Search Spot 3
                 </h1>
                 <p className="mt-2 max-w-2xl text-sm text-slate-300">
-                  COCO-SSD runs directly in the browser with mobile-aware inference
-                  timing, glassmorphism controls, and automatic product search.
+                  
                   <span className="mx-1 rounded-full bg-emerald-400/20 px-2 py-0.5 text-xs font-medium text-emerald-200">
                     by Bettaibi Chokri
                   </span>
                 </p>
               </div>
-
+              
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
@@ -153,16 +152,6 @@ function GoogleLensScanner() {
                 )}
               </div></div>
 
-          <div className="absolute inset-x-0 top-20 z-20 flex items-center justify-center gap-4">
-            <div
-              className={`h-3 w-3 rounded-full ${
-                isDetecting && cameraReady ? 'bg-emerald-400' : 'bg-amber-400'
-              }`}
-            />
-            <p className="text-sm text-white/80">
-              {isDetecting && cameraReady ? 'Detecting objects...' : 'Initializing camera...'}
-            </p>
-            </div>
           </div>
 
           <DetectionHistorySidebar
@@ -202,18 +191,13 @@ function GoogleLensScanner() {
                       {detections.length}
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                  {/* <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
                     <p className="text-slate-400">Model</p>
                     <p className="mt-1 text-xl font-semibold text-white">
                       {modelReady ? 'Ready' : 'Loading'}
                     </p>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                    <p className="text-slate-400">Camera</p>
-                    <p className="mt-1 text-xl font-semibold text-white">
-                      {cameraReady ? 'Active' : 'Waiting'}
-                    </p>
-                  </div>
+                  </div> */}
+                  
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
                     <p className="text-slate-400">Search</p>
                     <p className="mt-1 text-xl font-semibold text-white">
