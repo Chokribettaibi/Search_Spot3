@@ -185,250 +185,234 @@ function GoogleLensScanner() {
     );
   };
 
+  const liveStatus = isDetecting && cameraReady ? 'Live detection' : 'Preparing camera';
+  const activeStatusLabel = activeLabel || 'Scanning environment';
+
   return (
-    <div className="relative min-h-screen overflow-hidden bg-slate-950 text-white">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(6,182,212,0.22),_transparent_28%),radial-gradient(circle_at_bottom,_rgba(59,130,246,0.18),_transparent_24%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,_rgba(15,23,42,0.18),_rgba(2,6,23,0.94))]" />
+    <div className="app-shell">
+      <div className="ambient-backdrop" />
 
-      <div className="relative mx-auto flex min-h-screen max-w-7xl items-center justify-center p-0 md:p-6">
-        <div className="relative h-screen w-full overflow-hidden bordstatuser-white/10 bg-black shadow-[0_30px_100px_rgba(0,0,0,0.55)] md:h-[92vh] md:rounded-[2rem] md:border">
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            playsInline
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-
-          <canvas
-            ref={canvasRef}
-            className="pointer-events-none absolute inset-0 h-full w-full"
-          />
-
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,_rgba(2,6,23,0.22),_rgba(2,6,23,0.38),_rgba(2,6,23,0.72))]" />
-
-          <div className="pointer-events-none absolute inset-x-6 top-1/2 z-10 hidden -translate-y-1/2 md:block">
-            <div className="scan-grid rounded-[2rem] border border-white/10" />
-          </div>
-
-          <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 h-[58%] w-[78%] max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-cyan-400/20 bg-white/[0.02]">
-            <div className="scan-line" />
-            <div className="absolute inset-0 rounded-[2rem] shadow-[inset_0_0_60px_rgba(34,211,238,0.08)]" />
-          </div>
-
-          {!modelReady && (
-            <div className="absolute inset-0 z-40 flex items-center justify-center bg-slate-950/85 backdrop-blur-xl">
-              <div className="glass-card w-[min(92vw,26rem)] rounded-[2rem] p-8 text-center">
-                <div className="mx-auto h-16 w-16 animate-spin rounded-full border-4 border-white/10 border-t-cyan-300" />
-                <h1 className="mt-6 text-2xl font-semibold tracking-tight text-white">
-                  Loading model...
-                </h1>
-                <p className="mt-2 text-sm text-slate-300">
-                  Wassa3 Balik m3ana la7tha bark 
-                </p>
-              </div>
-            </div>
-          )}
-
-          <div className="absolute inset-x-0 top-0 z-20 p-4 md:p-6">
-            <div className="glass-card flex flex-col gap-4 rounded-[1.75rem] p-4 md:flex-row md:items-center md:justify-between md:p-5">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.35em] text-cyan-100 px-4 py-1 rounded-full bg-cyan-400/10 inline-block zindex-10">
-                  Foussana 1418 <span className="text-rose-400">|<br></br></span> <span className="text-amber-700 lowercase"><span className="text-cyan-200 uppercase" >RM</span>: Malek <span className="text-cyan-200 uppercase" >ARM</span> Dalel</span>
-                </p>
-                <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white md:text-3xl">
+      <header className="app-chrome app-header">
+        <div className="app-chrome-inner">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="min-w-0">
+              <p className="hero-chip">
+                Foussana 1418
+                <span className="mx-2 text-rose-300">|</span>
+                <span className="normal-case text-amber-100">
+                  RM: Malek ARM Dalel
+                </span>
+              </p>
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <h1 className="text-2xl font-semibold tracking-tight text-white md:text-3xl">
                   Search Spot 3
                 </h1>
-                <p className="mt-2 max-w-2xl text-sm text-slate-300">
-                  
-                  <span className="mx-1 rounded-full bg-emerald-400/20 px-2 py-0.5 text-xs font-medium text-emerald-200">
-                    by Bettaibi Chokri
-                  </span>
-                </p>
+                <span className="inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/12 px-3 py-1 text-xs font-medium text-emerald-100">
+                  by Bettaibi Chokri
+                </span>
               </div>
-              
-              <div className="flex flex-wrap gap-2">
+              <p className="mt-2 max-w-2xl text-sm text-slate-300">
+                Mobile camera workspace with live object detection, barcode capture,
+                and premium glass UI.
+              </p>
+            </div>
+
+            <div className="control-strip">
+              <button
+                type="button"
+                onClick={() =>
+                  setFacingMode((current) =>
+                    current === 'environment' ? 'user' : 'environment',
+                  )
+                }
+                className="secondary-btn"
+              >
+                Switch camera
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setHistoryOpen((current) => !current)}
+                className={historyOpen ? 'accent-btn' : 'secondary-btn'}
+              >
+                {historyOpen ? 'Hide history' : 'Show history'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setAutoSearchEnabled((current) => !current)}
+                className={autoSearchEnabled ? 'accent-btn' : 'secondary-btn'}
+              >
+                Auto search {autoSearchEnabled ? 'on' : 'off'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setBarcodeScanEnabled((current) => !current)}
+                disabled={!barcodeSupported}
+                className={barcodeScanEnabled ? 'primary-btn' : 'secondary-btn'}
+              >
+                Barcode live {barcodeScanEnabled ? 'on' : 'off'}
+              </button>
+
+              {torchSupported && (
                 <button
                   type="button"
-                  onClick={() =>
-                    setFacingMode((current) =>
-                      current === 'environment' ? 'user' : 'environment',
-                    )
-                  }
-                  className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-white transition hover:bg-white/15"
+                  onClick={toggleTorch}
+                  className={torchEnabled ? 'warning-btn' : 'secondary-btn'}
                 >
-                  Switch camera
+                  Flash {torchEnabled ? 'on' : 'off'}
                 </button>
-
-                <button
-                  type="button"
-                  onClick={() => setAutoSearchEnabled((current) => !current)}
-                  className={`rounded-full border px-4 py-2 text-sm transition ${
-                    autoSearchEnabled
-                      ? 'border-cyan-400/40 bg-cyan-400/15 text-cyan-100'
-                      : 'border-white/15 bg-white/10 text-white'
-                  }`}
-                >
-                  Auto search {autoSearchEnabled ? 'on' : 'off'}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setBarcodeScanEnabled((current) => !current)}
-                  disabled={!barcodeSupported}
-                  className={`rounded-full border px-4 py-2 text-sm transition ${
-                    barcodeScanEnabled
-                      ? 'border-emerald-400/40 bg-emerald-400/15 text-emerald-100'
-                      : 'border-white/15 bg-white/10 text-white'
-                  } disabled:cursor-not-allowed disabled:opacity-40`}
-                >
-                  Barcode live {barcodeScanEnabled ? 'on' : 'off'}
-                </button>
-
-                {torchSupported && (
-                  <button
-                    type="button"
-                    onClick={toggleTorch}
-                    className={`rounded-full border px-4 py-2 text-sm transition ${
-                      torchEnabled
-                        ? 'border-amber-400/50 bg-amber-400/20 text-amber-100'
-                        : 'border-white/15 bg-white/10 text-white'
-                    }`}
-                  >
-                    Flash {torchEnabled ? 'on' : 'off'}
-                  </button>
-                )}
-              </div></div>
-
-          </div>
-
-          <DetectionHistorySidebar
-            history={history}
-            isOpen={historyOpen}
-            onSearchItem={handleSearch}
-            onToggle={() => setHistoryOpen((current) => !current)}
-          />
-
-          <div className="absolute inset-x-0 bottom-0 z-20 p-4 md:p-6">
-            <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
-              <div className="glass-card rounded-[1.75rem] p-4 md:p-5">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
-                      Live status
-                    </p>
-                    <p className="mt-2 text-xl font-semibold capitalize text-white">
-                      {activeLabel || 'Scanning environment'}
-                    </p>
-                  </div>
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-medium ${
-                      isDetecting && cameraReady
-                        ? 'bg-emerald-400/20 text-emerald-200'
-                        : 'bg-amber-400/20 text-amber-200'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 text-amber-200">
-                    {isDetecting && cameraReady ? 'Live detection' : 'Preparing camera'}
-                    </div>
-                  </span>
-                </div>
-
-                <div className="mt-4 flex flex-wrap flex-end gap-3">
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                    <p className="text-slate-400">Objects</p>
-                    <p className="mt-1 text-xl font-semibold text-white">
-                      {detections.length}
-                    </p>
-                  </div>
-                  {/* <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                    <p className="text-slate-400">Model</p>
-                    <p className="mt-1 text-xl font-semibold text-white">
-                      {modelReady ? 'Ready' : 'Loading'}
-                    </p>
-                  </div> */}
-                  
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                    <p className="text-slate-400">Search</p>
-                    <p className="mt-1 text-xl font-semibold text-white">
-                      {autoSearchEnabled ? 'Auto' : 'Manual'}
-                    </p>
-                  </div>
-                   <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                    <p className="text-slate-400">Code Article</p>
-                    <p className="mt-1 text-xl font-semibold text-white">
-                      100435
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                    <p className="text-slate-400 ">Code Barre</p>
-                    <p className="mt-1 text-xl font-semibold text-white" id="code-barre">
-                      {barcodeValue}
-                    </p>
-                    <p className="mt-2 text-xs uppercase tracking-[0.2em] text-slate-400">
-                      {barcodeStatus}
-                    </p>
-                  </div>
-                  {/* <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                    <p className="text-slate-400">Position</p>
-                    <p className="mt-1 text-xl font-semibold text-white">
-                      <span className="text-rose-400">Palet 04</span>, <span className="text-amber-400">Cart: 25</span>
-                    </p>
-                  </div> */}
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                    <p className="text-slate-400">Quantité</p>
-                    <p className="mt-1 text-xl font-semibold text-white">
-                      15 <span className="text-slate-400">units</span>
-                    </p>
-                  </div>
-                </div>
-
-                {error && (
-                  <div className="mt-4 rounded-2xl border border-rose-400/30 bg-rose-500/10 p-3 text-sm text-rose-100">
-                    {error}
-                  </div>
-                )}
-              </div>
-
-              <div className="glass-card rounded-[1.75rem] p-4 md:p-5">
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
-                  Quick actions
-                </p>
-
-                <div className="mt-4 flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={handleCapture}
-                    className="flex h-16 w-16 items-center justify-center rounded-full border border-cyan-300/40 bg-cyan-300/20 shadow-[0_0_40px_rgba(34,211,238,0.22)] transition hover:scale-105 hover:bg-cyan-300/25"
-                    aria-label="Capture current frame"
-                  >
-                    <span className="h-10 w-10 rounded-full border-2 border-white bg-white/90" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => activeLabel && handleSearch(activeLabel)}
-                    disabled={!activeLabel}
-                    className="rounded-full border border-white/15 bg-white/10 px-4 py-3 text-sm text-white transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    Search with Google
-                  </button>
-                </div>
-
-                {capturedImage && (
-                  <div className="mt-4 overflow-hidden rounded-3xl border border-white/10">
-                    <img
-                      src={capturedImage}
-                      alt="Captured frame"
-                      className="h-40 w-full object-cover"
-                    />
-                  </div>
-                )}
-              </div>
+              )}
             </div>
           </div>
         </div>
-      </div>
+      </header>
+
+      <main className="camera-layout">
+        <div className="camera-viewport">
+          <div className="scanner-frame">
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              playsInline
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+
+            <canvas
+              ref={canvasRef}
+              className="pointer-events-none absolute inset-0 h-full w-full"
+            />
+
+            <div className="camera-shell-overlay" />
+
+            <div className="pointer-events-none absolute inset-x-5 top-1/2 z-10 hidden -translate-y-1/2 md:block">
+              <div className="scan-grid h-[56vh] max-h-[30rem] rounded-[2rem] border border-white/10" />
+            </div>
+
+            <div className="camera-focus-ring pointer-events-none absolute left-1/2 top-1/2 z-10 h-[54%] w-[82%] max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-cyan-300/20 bg-white/[0.03]">
+              <div className="scan-line" />
+              <div className="absolute inset-0 rounded-[2rem] shadow-[inset_0_0_80px_rgba(34,211,238,0.08)]" />
+            </div>
+
+            <div className="camera-overlay-top">
+              <div className="floating-badge">
+                <p className="eyebrow">Live status</p>
+                <p className="mt-2 text-lg font-semibold text-white md:text-2xl">
+                  {activeStatusLabel}
+                </p>
+              </div>
+
+              <span
+                className={`status-pill ${
+                  isDetecting && cameraReady
+                    ? 'bg-emerald-400/20 text-emerald-100'
+                    : 'bg-amber-400/20 text-amber-100'
+                }`}
+              >
+                {liveStatus}
+              </span>
+            </div>
+
+            <div className="camera-overlay-bottom">
+              <div className="floating-badge">
+                <p className="eyebrow">Code barre</p>
+                <p className="mt-2 text-lg font-semibold text-white" id="code-barre">
+                  {barcodeValue}
+                </p>
+                <p className="mt-2 text-xs uppercase tracking-[0.24em] text-slate-400">
+                  {barcodeStatus}
+                </p>
+              </div>
+
+              {capturedImage && (
+                <div className="preview-card">
+                  <img
+                    src={capturedImage}
+                    alt="Captured frame"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              )}
+            </div>
+
+            {!modelReady && (
+              <div className="absolute inset-0 z-40 flex items-center justify-center bg-slate-950/78 backdrop-blur-2xl">
+                <div className="panel w-[min(92vw,26rem)] p-8 text-center">
+                  <div className="mx-auto h-16 w-16 animate-spin rounded-full border-4 border-white/10 border-t-cyan-300" />
+                  <h2 className="mt-6 text-2xl font-semibold tracking-tight text-white">
+                    Loading model...
+                  </h2>
+                  <p className="mt-2 text-sm text-slate-300">
+                    Wassa3 Balik m3ana la7tha bark
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <DetectionHistorySidebar
+              history={history}
+              isOpen={historyOpen}
+              onSearchItem={handleSearch}
+              onToggle={() => setHistoryOpen((current) => !current)}
+            />
+          </div>
+        </div>
+      </main>
+
+      <footer className="app-chrome app-footer">
+        <div className="app-chrome-inner">
+          <div className="footer-grid">
+            <div className="stats-grid">
+              <div className="stat-card">
+                <p className="stat-label">Objects</p>
+                <p className="stat-value">{detections.length}</p>
+              </div>
+              <div className="stat-card">
+                <p className="stat-label">Search</p>
+                <p className="stat-value">{autoSearchEnabled ? 'Auto' : 'Manual'}</p>
+              </div>
+              <div className="stat-card">
+                <p className="stat-label">Code Article</p>
+                <p className="stat-value">100435</p>
+              </div>
+              <div className="stat-card">
+                <p className="stat-label">Quantite</p>
+                <p className="stat-value">
+                  15 <span className="text-slate-400">units</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="footer-actions">
+              <button
+                type="button"
+                onClick={handleCapture}
+                className="capture-btn"
+                aria-label="Capture current frame"
+              >
+                <span className="h-10 w-10 rounded-full border-2 border-white bg-white/90" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => activeLabel && handleSearch(activeLabel)}
+                disabled={!activeLabel}
+                className="secondary-btn min-w-[10rem]"
+              >
+                Search with Google
+              </button>
+            </div>
+          </div>
+
+          {error && (
+            <div className="mt-4 rounded-2xl border border-rose-400/30 bg-rose-500/10 p-3 text-sm text-rose-100">
+              {error}
+            </div>
+          )}
+        </div>
+      </footer>
     </div>
   );
 }
