@@ -1,18 +1,26 @@
-function DetectionHistorySidebar({
-  history,
-  isOpen,
-  onSearchItem,
-}) {
+function DetectionHistorySidebar({ history, isOpen, onSearchItem, onToggle }) {
   return (
     <aside
+      aria-hidden={!isOpen}
       className={`history-drawer ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
     >
       <div className="flex h-full flex-col">
-        <div className="border-b border-white/10 px-5 py-5">
-          <h2 className="text-lg font-semibold text-white">Detection history</h2>
-          <p className="mt-1 text-sm text-slate-300">
-            Stable object detections are saved here.
-          </p>
+        <div className="flex items-start justify-between gap-3 border-b border-white/10 px-5 py-5">
+          <div>
+            <h2 className="text-lg font-semibold text-white">Detection history</h2>
+            <p className="mt-1 text-sm text-slate-300">
+              Stable object detections are saved here.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={onToggle}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/12 bg-white/8 text-slate-100 transition duration-200 hover:bg-white/14 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60"
+            aria-label="Close detection history"
+          >
+            <span className="text-lg leading-none">×</span>
+          </button>
         </div>
 
         <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">

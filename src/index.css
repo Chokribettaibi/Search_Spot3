@@ -19,7 +19,8 @@
 
   body {
     margin: 0;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
     background: #020617;
     color: #e2e8f0;
@@ -48,6 +49,14 @@
     isolation: isolate;
   }
 
+  .shell-content {
+    @apply relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-7xl flex-col gap-4;
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+
   .ambient-backdrop {
     position: fixed;
     inset: 0;
@@ -60,65 +69,32 @@
     transform: translateZ(0);
   }
 
-  .app-chrome {
-    position: fixed;
-    left: 0;
-    right: 0;
-    z-index: 40;
-    padding-inline: var(--screen-gutter);
-    pointer-events: none;
-  }
-
-  .app-header {
-    top: 0;
-    padding-top: calc(env(safe-area-inset-top) + 0.75rem);
-  }
-
-  .app-footer {
-    bottom: 0;
-    padding-bottom: calc(env(safe-area-inset-bottom) + 0.75rem);
-  }
-
-  .app-chrome-inner {
-    @apply mx-auto max-w-6xl rounded-[28px] border border-white/10 bg-slate-900/40 text-white;
-    pointer-events: auto;
+  .glass-panel {
+    @apply border border-white/10 bg-[rgba(15,23,42,0.42)] text-white;
     backdrop-filter: blur(26px);
     -webkit-backdrop-filter: blur(26px);
     box-shadow:
-      0 20px 80px rgba(2, 6, 23, 0.32),
+      0 24px 80px rgba(2, 6, 23, 0.3),
       inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    padding: 1rem;
   }
 
-  .camera-layout {
-    min-height: 100dvh;
-    padding-top: calc(env(safe-area-inset-top) + var(--header-height));
-    padding-right: var(--screen-gutter);
-    padding-bottom: calc(env(safe-area-inset-bottom) + var(--footer-height));
-    padding-left: var(--screen-gutter);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+  .interactive-glow {
+    box-shadow:
+      0 24px 70px rgba(2, 6, 23, 0.28),
+      0 0 0 1px rgba(255, 255, 255, 0.03),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
 
-  .camera-viewport {
-    width: min(100%, 1120px);
-    height: calc(
-      100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) -
-        var(--header-height) - var(--footer-height)
-    );
-    max-height: 100%;
-    min-height: 18rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .camera-stage {
+    @apply flex items-center justify-center;
+    min-height: clamp(23rem, 58vh, 48rem);
   }
 
   .scanner-frame {
     @apply relative w-full overflow-hidden border border-white/10 bg-black;
-    height: 100%;
-    max-height: 100%;
+    aspect-ratio: 10 / 16;
+    min-height: clamp(22rem, 55vh, 46rem);
+    max-height: min(68vh, 52rem);
     border-radius: 2rem;
     box-shadow:
       0 24px 80px rgba(0, 0, 0, 0.38),
@@ -132,15 +108,6 @@
     background:
       linear-gradient(180deg, rgba(2, 6, 23, 0.42) 0%, rgba(2, 6, 23, 0.08) 34%, rgba(2, 6, 23, 0.52) 100%),
       radial-gradient(circle at center, rgba(34, 211, 238, 0.06), transparent 54%);
-  }
-
-  .panel {
-    @apply rounded-[28px] border border-white/10 bg-slate-900/40 backdrop-blur-xl;
-    box-shadow: 0 12px 40px rgba(2, 6, 23, 0.28);
-  }
-
-  .dashboard-grid {
-    @apply grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)];
   }
 
   .stats-grid {
@@ -173,52 +140,13 @@
     @apply inline-flex flex-wrap items-center rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-cyan-50;
   }
 
-  .control-strip {
-    @apply flex flex-wrap gap-2 lg:justify-end;
-  }
-
-  .primary-btn,
-  .secondary-btn,
-  .accent-btn,
-  .warning-btn {
-    @apply inline-flex min-h-11 items-center justify-center rounded-full px-4 py-2 text-sm font-medium transition duration-200 ease-out;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-  }
-
-  .primary-btn {
-    @apply border border-cyan-300/30 bg-cyan-300/20 text-cyan-50 hover:bg-cyan-300/25;
-    box-shadow: 0 0 30px rgba(34, 211, 238, 0.14);
-  }
-
-  .secondary-btn {
-    @apply border border-white/15 bg-white/10 text-white hover:bg-white/15;
-  }
-
-  .accent-btn {
-    @apply border border-cyan-400/30 bg-cyan-400/20 text-cyan-100 hover:bg-cyan-400/25;
-  }
-
-  .warning-btn {
-    @apply border border-amber-400/30 bg-amber-400/20 text-amber-100 hover:bg-amber-400/25;
-  }
-
   .status-pill {
-    @apply rounded-full px-3 py-1 text-xs font-medium;
-  }
-
-  .capture-btn {
-    @apply inline-flex h-16 w-16 items-center justify-center rounded-full border border-cyan-300/30 bg-cyan-300/20 transition duration-200 ease-out hover:scale-[1.03] hover:bg-cyan-300/25;
-    box-shadow: 0 0 32px rgba(34, 211, 238, 0.18);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    @apply rounded-full border border-white/10 px-3 py-1 text-xs font-medium shadow-[0_10px_28px_rgba(2,6,23,0.22)] backdrop-blur-xl;
   }
 
   .history-drawer {
-    @apply fixed right-0 z-50 w-full border-l border-white/10 bg-slate-950/70 transition-transform duration-300 ease-out;
-    top: calc(env(safe-area-inset-top) + 1rem);
-    bottom: calc(env(safe-area-inset-bottom) + 1rem);
-    max-width: min(88vw, 24rem);
+    @apply absolute right-0 top-0 z-50 h-full w-full border-l border-white/10 bg-slate-950/70 transition-transform duration-300 ease-out;
+    max-width: min(90vw, 24rem);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     box-shadow: -24px 0 80px rgba(2, 6, 23, 0.35);
@@ -247,7 +175,7 @@
   }
 
   .floating-badge {
-    @apply max-w-[16rem] rounded-[24px] border border-white/10 bg-slate-950/40 px-4 py-3;
+    @apply rounded-[24px] border border-white/10 bg-[rgba(2,6,23,0.42)] px-4 py-3;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     box-shadow:
@@ -257,18 +185,10 @@
   }
 
   .preview-card {
-    @apply h-24 w-24 overflow-hidden rounded-[24px] border border-white/10 bg-black/40;
+    @apply h-24 w-24 overflow-hidden rounded-[24px] border border-white/10 bg-black/40 sm:h-28 sm:w-28;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     box-shadow: 0 16px 40px rgba(2, 6, 23, 0.24);
-  }
-
-  .footer-grid {
-    @apply grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center;
-  }
-
-  .footer-actions {
-    @apply flex items-center justify-between gap-3 lg:justify-end;
   }
 
   .scan-grid {
@@ -316,17 +236,9 @@
 }
 
 @media (max-width: 639px) {
-  :root {
-    --header-height: 11.75rem;
-    --footer-height: 16.5rem;
-  }
-
-  .app-chrome-inner {
-    border-radius: 1.5rem;
-  }
-
   .scanner-frame {
     border-radius: 1.75rem;
+    max-height: 62vh;
   }
 
   .floating-badge {
@@ -339,19 +251,21 @@
 }
 
 @media (min-width: 1024px) {
-  :root {
-    --header-height: 8.75rem;
-    --footer-height: 9.5rem;
+  .shell-content {
+    padding-top: max(1.5rem, env(safe-area-inset-top));
+    padding-right: max(1.5rem, env(safe-area-inset-right));
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+    padding-left: max(1.5rem, env(safe-area-inset-left));
+  }
+
+  .scanner-frame {
+    aspect-ratio: 16 / 10;
+    min-height: clamp(26rem, 58vh, 46rem);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .scan-line,
-  .capture-btn,
-  .primary-btn,
-  .secondary-btn,
-  .accent-btn,
-  .warning-btn,
   .history-card,
   .history-drawer,
   .ambient-backdrop {
