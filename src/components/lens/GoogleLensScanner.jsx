@@ -5,10 +5,17 @@ import { useObjectDetection } from '../../hooks/useObjectDetection';
 function GoogleLensScanner() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  const barcodeDetectorRef = useRef(null);
+  const barcodeFrameRef = useRef(0);
+  const barcodeLastScanRef = useRef(0);
   const [facingMode, setFacingMode] = useState('environment');
   const [historyOpen, setHistoryOpen] = useState(false);
   const [autoSearchEnabled, setAutoSearchEnabled] = useState(true);
   const [capturedImage, setCapturedImage] = useState('');
+  const [barcodeScanEnabled, setBarcodeScanEnabled] = useState(false);
+  const [barcodeSupported, setBarcodeSupported] = useState(false);
+  const [barcodeValue, setBarcodeValue] = useState('619345678901');
+  const [barcodeStatus, setBarcodeStatus] = useState('Barcode standby');
 
   const {
     activeLabel,
@@ -34,6 +41,134 @@ function GoogleLensScanner() {
       startCamera(facingMode);
     }
   }, [facingMode, modelReady, startCamera]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function setupBarcodeDetector() {
+      if (typeof window === 'undefined' || !('BarcodeDetector' in window)) {
+        if (active) {
+          setBarcodeSupported(false);
+          setBarcodeStatus('Barcode unsupported');
+        }
+        return;
+      }
+
+      try {
+        const supportedFormats = await window.BarcodeDetector.getSupportedFormats?.();
+        const preferredFormats = [
+          'ean_13',
+          'ean_8',
+          'upc_a',
+          'upc_e',
+          'code_128',
+          'code_39',
+          'qr_code',
+        ];
+        const formats =
+          supportedFormats?.filter((format) => preferredFormats.includes(format)) ??
+          preferredFormats;
+
+        barcodeDetectorRef.current = new window.BarcodeDetector(
+          formats.length ? { formats } : undefined,
+        );
+
+        if (active) {
+          setBarcodeSupported(true);
+          setBarcodeStatus('Barcode ready');
+        }
+      } catch {
+        if (active) {
+          setBarcodeSupported(false);
+          setBarcodeStatus('Barcode unavailable');
+        }
+      }
+    }
+
+    setupBarcodeDetector();
+
+    return () => {
+      active = false;
+      if (barcodeFrameRef.current) {
+        cancelAnimationFrame(barcodeFrameRef.current);
+        barcodeFrameRef.current = 0;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!barcodeSupported || !barcodeScanEnabled || !cameraReady) {
+      if (barcodeFrameRef.current) {
+        cancelAnimationFrame(barcodeFrameRef.current);
+        barcodeFrameRef.current = 0;
+      }
+
+      setBarcodeStatus((current) => {
+        if (!barcodeSupported) {
+          return 'Barcode unsupported';
+        }
+
+        return barcodeScanEnabled ? 'Barcode waiting camera' : 'Barcode standby';
+      });
+      return;
+    }
+
+    let active = true;
+
+    const scanBarcodes = async () => {
+      const video = videoRef.current;
+      const detector = barcodeDetectorRef.current;
+
+      if (!active || !video || !detector || video.readyState < 2) {
+        barcodeFrameRef.current = requestAnimationFrame(scanBarcodes);
+        return;
+      }
+
+      const now = performance.now();
+      if (now - barcodeLastScanRef.current < 350) {
+        barcodeFrameRef.current = requestAnimationFrame(scanBarcodes);
+        return;
+      }
+
+      barcodeLastScanRef.current = now;
+
+      try {
+        const barcodes = await detector.detect(video);
+        if (!active) {
+          return;
+        }
+
+        if (barcodes.length > 0) {
+          const liveValue = barcodes[0].rawValue?.trim();
+          if (liveValue) {
+            setBarcodeValue(liveValue);
+            setBarcodeStatus('Barcode live');
+          }
+        } else {
+          setBarcodeStatus('Barcode scanning...');
+        }
+      } catch {
+        if (active) {
+          setBarcodeStatus('Barcode scan error');
+        }
+      } finally {
+        if (active) {
+          barcodeFrameRef.current = requestAnimationFrame(scanBarcodes);
+        }
+      }
+    };
+
+    setBarcodeStatus('Barcode scanning...');
+    barcodeFrameRef.current = requestAnimationFrame(scanBarcodes);
+
+    return () => {
+      active = false;
+      if (barcodeFrameRef.current) {
+        cancelAnimationFrame(barcodeFrameRef.current);
+        barcodeFrameRef.current = 0;
+      }
+    };
+  }, [barcodeScanEnabled, barcodeSupported, cameraReady]);
 
   const handleCapture = () => {
     const frame = captureFrame();
@@ -98,8 +233,8 @@ function GoogleLensScanner() {
           <div className="absolute inset-x-0 top-0 z-20 p-4 md:p-6">
             <div className="glass-card flex flex-col gap-4 rounded-[1.75rem] p-4 md:flex-row md:items-center md:justify-between md:p-5">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.35em] text-cyan-200/80 px-4 py-1 rounded-full bg-cyan-400/10 inline-block zindex-10">
-                  Foussana 1418 <span className="text-rose-400">|<br></br></span> <span className="text-amber-400 lowercase"><span className="text-cyan-200 uppercase" >RM</span>: Malek <span className="text-cyan-200 uppercase" >ARM</span> Dalel</span>
+                <p className="text-[11px] uppercase tracking-[0.35em] text-cyan-100 px-4 py-1 rounded-full bg-cyan-400/10 inline-block zindex-10">
+                  Foussana 1418 <span className="text-rose-400">|<br></br></span> <span className="text-amber-700 lowercase"><span className="text-cyan-200 uppercase" >RM</span>: Malek <span className="text-cyan-200 uppercase" >ARM</span> Dalel</span>
                 </p>
                 <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white md:text-3xl">
                   Search Spot 3
@@ -135,6 +270,19 @@ function GoogleLensScanner() {
                   }`}
                 >
                   Auto search {autoSearchEnabled ? 'on' : 'off'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setBarcodeScanEnabled((current) => !current)}
+                  disabled={!barcodeSupported}
+                  className={`rounded-full border px-4 py-2 text-sm transition ${
+                    barcodeScanEnabled
+                      ? 'border-emerald-400/40 bg-emerald-400/15 text-emerald-100'
+                      : 'border-white/15 bg-white/10 text-white'
+                  } disabled:cursor-not-allowed disabled:opacity-40`}
+                >
+                  Barcode live {barcodeScanEnabled ? 'on' : 'off'}
                 </button>
 
                 {torchSupported && (
@@ -180,11 +328,13 @@ function GoogleLensScanner() {
                         : 'bg-amber-400/20 text-amber-200'
                     }`}
                   >
+                    <div className="flex items-center gap-2 text-amber-200">
                     {isDetecting && cameraReady ? 'Live detection' : 'Preparing camera'}
+                    </div>
                   </span>
                 </div>
 
-                <div className="mt-4 grid grid-cols-2 gap-3 text-sm md:grid-cols-4">
+                <div className="mt-4 flex flex-wrap flex-end gap-3">
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
                     <p className="text-slate-400">Objects</p>
                     <p className="mt-1 text-xl font-semibold text-white">
@@ -211,21 +361,24 @@ function GoogleLensScanner() {
                     </p>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                    <p className="text-slate-400">Code Barre</p>
-                    <p className="mt-1 text-xl font-semibold text-white">
-                      619345678901
+                    <p className="text-slate-400 ">Code Barre</p>
+                    <p className="mt-1 text-xl font-semibold text-white" id="code-barre">
+                      {barcodeValue}
+                    </p>
+                    <p className="mt-2 text-xs uppercase tracking-[0.2em] text-slate-400">
+                      {barcodeStatus}
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
+                  {/* <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
                     <p className="text-slate-400">Position</p>
                     <p className="mt-1 text-xl font-semibold text-white">
                       <span className="text-rose-400">Palet 04</span>, <span className="text-amber-400">Cart: 25</span>
                     </p>
-                  </div>
+                  </div> */}
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
                     <p className="text-slate-400">Quantité</p>
                     <p className="mt-1 text-xl font-semibold text-white">
-                      150 <span className="text-slate-400">units</span>
+                      15 <span className="text-slate-400">units</span>
                     </p>
                   </div>
                 </div>
@@ -258,7 +411,7 @@ function GoogleLensScanner() {
                     disabled={!activeLabel}
                     className="rounded-full border border-white/15 bg-white/10 px-4 py-3 text-sm text-white transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    Search detected object
+                    Search with Google
                   </button>
                 </div>
 
